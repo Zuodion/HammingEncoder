@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <title>Page Title</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="stylesheet" type="text/css" media="screen" href="main.css">
+        <script src="app.js"></script>
+    </head>
+    <body>
+        <div class="header">Hamming encoder and decoder</div>
+        <div class="input-form">
+            <p>Please select your data type:</p>
+            <div class="radio">
+                <input type="radio" id="binaryRadio" name="type" checked value="binaryRadio">
+                <label for="binaryRadio">Binary</label>
+            </div>
+            <div class="radio">
+                <input type="radio" id="decimalRadio" name="type" value="decimalRadio">
+                <label for="decimalRadio">Decimal</label>
+            </div>
+            <div class="radio">
+                <input type="radio" id="stringRadio" name="type" value="stringRadio">
+                <label for="stringRadio">String</label>
+            </div>
+            <div class="text-field">
+                <div>Please text your data:</div>
+                <input class="input-data" id="inputData">
+                <button class="button-start" onclick="main._viewController.start()">Start</button>
+            </div>
+        </div>
+        <hr>
+        <div class="output-field">
+
+        </div>
+    </body>
+</html>
+
+<style>
+body {
+    font-family: 'Verdana';
+    background-color: rgb(228, 228, 228);
+    font-size: 20px;
+}
+
+.header {
+    margin: 1em;
+    text-align: center;
+    font-size: 36px;
+}
+
+.input-data, .button-start {
+    background-color: aliceblue;
+    margin-bottom: 1em;
+    font-size: inherit;
+}
+
+.button-start:focus {
+    outline: none;
+}
+
+.input-data:focus {
+    outline: none;
+}
+
+
+.radio{
+    margin-bottom: 1em;
+}
+</style>
