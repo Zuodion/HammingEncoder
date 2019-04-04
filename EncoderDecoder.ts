@@ -1,11 +1,15 @@
 class EncoderDecoder {
     private _matrix: Array<number>;
-    constructor(matrix: Matrix) {
+    private _converterFromBinary: ConverterFromBinary;
+    private _type: string = '';
+    constructor(matrix: Matrix, converterFromBinary: ConverterFromBinary) {
         this._matrix = matrix.defineMatrix()
+        this._converterFromBinary = converterFromBinary
     }
-    public encoder (binaryCode: String): void {
+    public encoder (binaryCode: string, type: string): void {
+        this._type = type
         let fourBitsArray: any = binaryCode.match(/.{1,4}/g)
-        let lastElement: String = fourBitsArray[fourBitsArray.length - 1]
+        let lastElement: string = fourBitsArray[fourBitsArray.length - 1]
         if (lastElement.length < 4) {
             let newLastElement: any = String(lastElement).split('')
             while (newLastElement.length !== 4) {
@@ -51,7 +55,6 @@ class EncoderDecoder {
 
             encodedBitsArray.push(newElementArray.join(''))
         }
-        console.log(encodedBitsArray)
         this.errorIntroducer(encodedBitsArray)
     }
 
@@ -73,8 +76,8 @@ class EncoderDecoder {
     }
 
     public decoder (encodedCode: Array<string>): void {
-        console.log(encodedCode)
-        let decodedCode: Array<string> = [];
+        
+        let decodedCode: any = [];
         for (let codeIndex = 0; codeIndex < encodedCode.length; codeIndex++) {
             let sevenBitsCode: any = encodedCode[codeIndex]
             let errorIndex: number = 0;
@@ -108,6 +111,14 @@ class EncoderDecoder {
             }
             decodedCode.push(fixedCode.join(''))
         }
-        console.log(decodedCode)
+        let fourBitsArray = [];
+        for (let decodedCodeIndex = 0; decodedCodeIndex < decodedCode.length; decodedCodeIndex++) {
+            let fourBits: any = decodedCode[decodedCodeIndex].split('')
+            fourBits.splice(0, 1);
+            fourBits.splice(0, 1);
+            fourBits.splice(1, 1);
+            fourBitsArray.push(fourBits.join(''))
+        }
+        this._converterFromBinary.convertToOriginalData(fourBitsArray, this._type)
     }
 }

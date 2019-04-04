@@ -1,28 +1,26 @@
-class Converter {
+class ConverterToBinary {
     private _inputData: any;
-    private _type: String = '';
+    private _type: string = '';
     private _encoderDecoder: EncoderDecoder;
     constructor(encoderDecoder: EncoderDecoder) {
         this._encoderDecoder = encoderDecoder
     }
-    public initializeConverter (inputData: String, type: String): void {
+    public initializeConverter (inputData: string, type: string): void {
         this._inputData = inputData
         this._type = type
         if (this._inputData === '') return alert('Please enter the number or string')
-        if (this._type === 'decimalRadio') {
+        if (this._type === 'numberRadio') {
             if (!Number(this._inputData)) {
-                return alert('You should enter the number decimal number or change the data type');
+                return alert('You should enter the number or change the data type');
             }
-            this.fromDecimalToBinary()
-        } else if (this._type === 'stringRadio') {
+            this.fromNumberToBinary()
+        } else {
             if (Number(this._inputData)) return alert('You should enter the string or change the data type');
             this.fromStringToBinary()
-        } else {
-            if (!Number('0b' + this._inputData)) return alert('Please enter the binary number or change the data type')
         }
-        this._encoderDecoder.encoder(this._inputData)
+        this._encoderDecoder.encoder(this._inputData, this._type)
     }
-    private fromDecimalToBinary (): void {
+    private fromNumberToBinary (): void {
         let binary: string = '';
         for (let i = 0; i < this._inputData.length; i++) {
             let fourBitsNumber: string = (Number(this._inputData[i]).toString(2))
@@ -33,8 +31,8 @@ class Converter {
                 }
                 fourBitsNumber = fourBitsArray.join('')
             }
-            
-                binary += fourBitsNumber
+
+            binary += fourBitsNumber
         }
         this._inputData = binary;
     }
