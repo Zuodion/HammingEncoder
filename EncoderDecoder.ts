@@ -15,9 +15,9 @@ class EncoderDecoder {
             fourBitsArray.pop()
             fourBitsArray.push(newLastElement)
         }
-        let encodedBitsArray: Array<number> = [];
-        for (let index = 0; index < fourBitsArray.length; index++) {
-            let newElement = fourBitsArray[index].split('')
+        let encodedBitsArray: Array<string> = [];
+        for (let quadIndex = 0; quadIndex < fourBitsArray.length; quadIndex++) {
+            let newElement = fourBitsArray[quadIndex].split('')
             newElement.splice(0, 0, '0')
             newElement.splice(1, 0, '0')
             newElement.splice(3, 0, '0')
@@ -33,10 +33,8 @@ class EncoderDecoder {
                 for (let i = 0; i < hvArray.length; i++) {
                     if (hvArray[i] === '1') rowSum++
                 }
-                //console.log(rowSum)
-                
+
                 if (rowSum % 2 === 1) {
-                    //console.log('hi')
                     switch (matrixRow) {
                         case 0:
                             newElementArray.splice(3, 1, '1')
@@ -54,9 +52,62 @@ class EncoderDecoder {
             encodedBitsArray.push(newElementArray.join(''))
         }
         console.log(encodedBitsArray)
-        this.decoder(encodedBitsArray)
+        this.errorIntroducer(encodedBitsArray)
     }
-    public decoder (encodedCode: Array<number>): void {
 
+    private randomInteger (min: number, max: number) {
+        var rand = min - 0.5 + Math.random() * (max - min + 1)
+        rand = Math.round(rand);
+        return rand;
+    }
+
+    private errorIntroducer (encodedCode: any): void {
+        let encodedCorruptedCode: any = [];
+        for (let index = 0; index < encodedCode.length; index++) {
+            let encodedCodeArray = encodedCode[index].split('')
+            let randomIndex = this.randomInteger(1, 7) - 1
+            encodedCodeArray[randomIndex] = String(Number(!Number(encodedCodeArray[randomIndex])));
+            encodedCorruptedCode.push(encodedCodeArray.join(''))
+        }
+        this.decoder(encodedCorruptedCode)
+    }
+
+    public decoder (encodedCode: Array<string>): void {
+        console.log(encodedCode)
+        let decodedCode: Array<string> = [];
+        for (let codeIndex = 0; codeIndex < encodedCode.length; codeIndex++) {
+            let sevenBitsCode: any = encodedCode[codeIndex]
+            let errorIndex: number = 0;
+            for (let matrixRow = 0; matrixRow < this._matrix.length; matrixRow++) {
+                let result: string = (Number('0b' + sevenBitsCode.toString(2)) & Number('0b' + this._matrix[matrixRow].toString(2))).toString(2)
+
+                let hvArray: Array<string> = result.split('')
+                let rowSum: number = 0;
+
+                for (let i = 0; i < hvArray.length; i++) {
+                    if (hvArray[i] === '1') rowSum++
+                }
+
+                if (rowSum % 2 === 1) {
+                    switch (matrixRow) {
+                        case 0:
+                            errorIndex += 4
+                            break;
+                        case 1:
+                            errorIndex += 2
+                            break;
+                        case 2:
+                            errorIndex += 1
+                            break;
+                    }
+                }
+            }
+            let fixedCode = sevenBitsCode.split('')
+            if (fixedCode[errorIndex - 1]) {
+                fixedCode[errorIndex - 1] = String(Number(!Number(fixedCode[errorIndex - 1])))
+            }
+            decodedCode.push(fixedCode.join(''))
+        }
+        console.log(decodedCode)
     }
 }

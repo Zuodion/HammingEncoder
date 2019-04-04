@@ -27,15 +27,25 @@ var Converter = /** @class */ (function () {
         this._encoderDecoder.encoder(this._inputData);
     };
     Converter.prototype.fromDecimalToBinary = function () {
-        this._inputData = Number(this._inputData).toString(2);
+        var binary = '';
+        for (var i = 0; i < this._inputData.length; i++) {
+            var fourBitsNumber = (Number(this._inputData[i]).toString(2));
+            if (fourBitsNumber.length < 4) {
+                var fourBitsArray = String(fourBitsNumber).split('');
+                while (fourBitsArray.length !== 4) {
+                    fourBitsArray.unshift('0');
+                }
+                fourBitsNumber = fourBitsArray.join('');
+            }
+            binary += fourBitsNumber;
+        }
+        this._inputData = binary;
     };
     Converter.prototype.fromStringToBinary = function () {
         var binaryArray = [];
         for (var i = 0; i < this._inputData.length; i++) {
             var decimalCode = this._inputData.charCodeAt(i);
-            console.log(decimalCode);
             var binaryCode = decimalCode.toString(2);
-            console.log(binaryCode);
             if (binaryCode.length < 12) {
                 var newBinaryCode = String(binaryCode).split('');
                 while (newBinaryCode.length !== 12) {
@@ -66,8 +76,8 @@ var EncoderDecoder = /** @class */ (function () {
             fourBitsArray.push(newLastElement);
         }
         var encodedBitsArray = [];
-        for (var index = 0; index < fourBitsArray.length; index++) {
-            var newElement = fourBitsArray[index].split('');
+        for (var quadIndex = 0; quadIndex < fourBitsArray.length; quadIndex++) {
+            var newElement = fourBitsArray[quadIndex].split('');
             newElement.splice(0, 0, '0');
             newElement.splice(1, 0, '0');
             newElement.splice(3, 0, '0');
@@ -81,9 +91,7 @@ var EncoderDecoder = /** @class */ (function () {
                     if (hvArray[i] === '1')
                         rowSum++;
                 }
-                //console.log(rowSum)
                 if (rowSum % 2 === 1) {
-                    //console.log('hi')
                     switch (matrixRow) {
                         case 0:
                             newElementArray.splice(3, 1, '1');
@@ -100,16 +108,60 @@ var EncoderDecoder = /** @class */ (function () {
             encodedBitsArray.push(newElementArray.join(''));
         }
         console.log(encodedBitsArray);
-        this.decoder(encodedBitsArray);
+        this.errorIntroducer(encodedBitsArray);
+    };
+    EncoderDecoder.prototype.randomInteger = function (min, max) {
+        var rand = min - 0.5 + Math.random() * (max - min + 1);
+        rand = Math.round(rand);
+        return rand;
+    };
+    EncoderDecoder.prototype.errorIntroducer = function (encodedCode) {
+        var encodedCorruptedCode = [];
+        for (var index = 0; index < encodedCode.length; index++) {
+            var encodedCodeArray = encodedCode[index].split('');
+            var randomIndex = this.randomInteger(1, 7) - 1;
+            encodedCodeArray[randomIndex] = String(Number(!Number(encodedCodeArray[randomIndex])));
+            encodedCorruptedCode.push(encodedCodeArray.join(''));
+        }
+        this.decoder(encodedCorruptedCode);
     };
     EncoderDecoder.prototype.decoder = function (encodedCode) {
+        console.log(encodedCode);
+        var decodedCode = [];
+        for (var codeIndex = 0; codeIndex < encodedCode.length; codeIndex++) {
+            var sevenBitsCode = encodedCode[codeIndex];
+            var errorIndex = 0;
+            for (var matrixRow = 0; matrixRow < this._matrix.length; matrixRow++) {
+                var result = (Number('0b' + sevenBitsCode.toString(2)) & Number('0b' + this._matrix[matrixRow].toString(2))).toString(2);
+                var hvArray = result.split('');
+                var rowSum = 0;
+                for (var i = 0; i < hvArray.length; i++) {
+                    if (hvArray[i] === '1')
+                        rowSum++;
+                }
+                if (rowSum % 2 === 1) {
+                    switch (matrixRow) {
+                        case 0:
+                            errorIndex += 4;
+                            break;
+                        case 1:
+                            errorIndex += 2;
+                            break;
+                        case 2:
+                            errorIndex += 1;
+                            break;
+                    }
+                }
+            }
+            var fixedCode = sevenBitsCode.split('');
+            if (fixedCode[errorIndex - 1]) {
+                fixedCode[errorIndex - 1] = String(Number(!Number(fixedCode[errorIndex - 1])));
+            }
+            decodedCode.push(fixedCode.join(''));
+        }
+        console.log(decodedCode);
     };
     return EncoderDecoder;
-}());
-var ErrorIntroducer = /** @class */ (function () {
-    function ErrorIntroducer() {
-    }
-    return ErrorIntroducer;
 }());
 var ViewController = /** @class */ (function () {
     function ViewController(converter) {
@@ -139,7 +191,6 @@ var Main = /** @class */ (function () {
     function Main() {
         this._matrix = new Matrix();
         this._encoderDecoder = new EncoderDecoder(this._matrix);
-        this._errorIntroducer = new ErrorIntroducer();
         this._converter = new Converter(this._encoderDecoder);
         this._viewController = new ViewController(this._converter);
     }
