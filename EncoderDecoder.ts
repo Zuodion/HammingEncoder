@@ -14,17 +14,7 @@ class EncoderDecoder {
     }
     public encoder (binaryCode: string): void {
         let fourBitsArray: any = binaryCode.match(/.{1,4}/g)
-        console.log(fourBitsArray)
-        let lastElement: string = fourBitsArray[fourBitsArray.length - 1]
-        if (lastElement.length < 4) {
-            let newLastElement: any = String(lastElement).split('')
-            while (newLastElement.length !== 4) {
-                newLastElement.unshift('0')
-            }
-            newLastElement = newLastElement.join('')
-            fourBitsArray.pop()
-            fourBitsArray.push(newLastElement)
-        }
+        this._logger.notice(`Далі данні діляться на чотирьох бітові символи ${fourBitsArray}`)
         let encodedBitsArray: Array<string> = [];
         for (let quadIndex = 0; quadIndex < fourBitsArray.length; quadIndex++) {
             let newElement = fourBitsArray[quadIndex].split('')
@@ -36,9 +26,7 @@ class EncoderDecoder {
             let newElementArray = newElement.split('')
             for (let matrixRow = 0; matrixRow < this._matrix.length; matrixRow++) {
                 let result: string = (Number('0b' + newElement.toString(2)) & Number('0b' + this._matrix[matrixRow].toString(2))).toString(2)
-
                 let hvArray: Array<string> = result.split('')
-
                 let rowSum: number = 0;
                 for (let i = 0; i < hvArray.length; i++) {
                     if (hvArray[i] === '1') rowSum++
@@ -58,10 +46,9 @@ class EncoderDecoder {
                     }
                 }
             }
-
             encodedBitsArray.push(newElementArray.join(''))
         }
-        console.log(encodedBitsArray)
+        this._logger.notice(`Числа кодуються кодом Хемінга ${encodedBitsArray}`)
         if (this._introduceError) {
             this.errorIntroducer(encodedBitsArray)
         } else {
@@ -78,56 +65,71 @@ class EncoderDecoder {
 
     private errorIntroducer (encodedCode: any): void {
         let encodedCorruptedCode: any = [];
+        let htmlArray: any = []
+
         for (let index = 0; index < encodedCode.length; index++) {
             let encodedCodeArray = encodedCode[index].split('')
-            let randomIndex = this.randomInteger(1, 7) - 1
+            let randomIndex = (this.randomInteger(1, 7) - 1)
             encodedCodeArray[randomIndex] = String(Number(!Number(encodedCodeArray[randomIndex])));
+            let htmlElement = this._logger.colorizeElement(encodedCodeArray.join(''), randomIndex, 'red')
+            htmlArray.push(htmlElement)
             encodedCorruptedCode.push(encodedCodeArray.join(''))
         }
-        console.log(encodedCorruptedCode)
+        this._logger.notice(`Випадковим чином вводяться однобітові помилки: ${htmlArray}`)
         this.decoder(encodedCorruptedCode)
     }
 
     public decoder (encodedCode: Array<string>): void {
-
+        let htmlArray: any = []
         let decodedCode: any = [];
+
         for (let codeIndex = 0; codeIndex < encodedCode.length; codeIndex++) {
             let sevenBitsCode: any = encodedCode[codeIndex]
             let errorIndex: number = 0;
 
             // Block correction error
-            for (let matrixRow = 0; matrixRow < this._matrix.length; matrixRow++) {
-                let result: string = (Number('0b' + sevenBitsCode.toString(2)) & Number('0b' + this._matrix[matrixRow].toString(2))).toString(2)
+            if (this._introduceError) {
+                for (let matrixRow = 0; matrixRow < this._matrix.length; matrixRow++) {
+                    let result: string = (Number('0b' + sevenBitsCode.toString(2)) & Number('0b' + this._matrix[matrixRow].toString(2))).toString(2)
 
-                let hvArray: Array<string> = result.split('')
-                let rowSum: number = 0;
+                    let hvArray: Array<string> = result.split('')
+                    let rowSum: number = 0;
 
-                for (let i = 0; i < hvArray.length; i++) {
-                    if (hvArray[i] === '1') rowSum++
-                }
+                    for (let i = 0; i < hvArray.length; i++) {
+                        if (hvArray[i] === '1') rowSum++
+                    }
 
-                if (rowSum % 2 === 1) {
-                    switch (matrixRow) {
-                        case 0:
-                            errorIndex += 4
-                            break;
-                        case 1:
-                            errorIndex += 2
-                            break;
-                        case 2:
-                            errorIndex += 1
-                            break;
+                    if (rowSum % 2 === 1) {
+                        switch (matrixRow) {
+                            case 0:
+                                errorIndex += 4
+                                break;
+                            case 1:
+                                errorIndex += 2
+                                break;
+                            case 2:
+                                errorIndex += 1
+                                break;
+                        }
                     }
                 }
             }
-            
             let fixedCode = sevenBitsCode.split('')
             if (fixedCode[errorIndex - 1]) {
                 fixedCode[errorIndex - 1] = String(Number(!Number(fixedCode[errorIndex - 1])))
             }
+            let htmlElement = this._logger.colorizeElement(fixedCode.join(''), errorIndex - 1, 'aqua')
+            htmlArray.push(htmlElement)
+
+
             decodedCode.push(fixedCode.join(''))
+
+
         }
-        console.log(decodedCode)
+        if (this._introduceError) {
+            this._logger.notice(`За допомогою декодування знаходяться помилки і виправляються: ${htmlArray}`)
+        }
+
         let fourBitsArray = [];
         for (let decodedCodeIndex = 0; decodedCodeIndex < decodedCode.length; decodedCodeIndex++) {
             let fourBits: any = decodedCode[decodedCodeIndex].split('')
@@ -136,7 +138,7 @@ class EncoderDecoder {
             fourBits.splice(1, 1);
             fourBitsArray.push(fourBits.join(''))
         }
-        console.log(fourBitsArray)
+        this._logger.notice(`Забирається перевірочна частина ${fourBitsArray}`)
         this._converterFromBinary.convertToOriginalData(fourBitsArray)
     }
 }

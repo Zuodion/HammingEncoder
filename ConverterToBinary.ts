@@ -10,23 +10,27 @@ class ConverterToBinary {
     public initializeConverter (inputData: string, type: string): void {
         this._inputData = inputData
         this._type = type
-        if (this._inputData === '') return alert('Please enter the number or string')
-        if (this._type === 'decimalRadio') {
-            if (!Number(this._inputData)) {
-                return alert('You should enter the decimal number or change the data type');
+        
+        if (inputData === '') return alert('Будь ласка введіть число або строку')
+        if (type === 'decimalRadio') {
+            if (!Number(inputData)) {
+                return alert('Вам потрібно ввести десяткове число або змінити тип даних');
             }
             this.fromDecimalToBinary()
-        } else if (this._type === 'stringRadio') {
-            if (Number(this._inputData)) return alert('You should enter the string or change the data type');
+        } else if (type === 'stringRadio') {
+            if (Number(inputData)) return alert('Вам потрібно ввести текст або змінити тип даних');
             this.fromStringToBinary()
         } else {
-            if (this._inputData.length%4 !== 0) return alert('You should enter the binary number multiple to 4')
+            if (!Number('0b' + inputData)) return alert('Вам потрібно ввести двійкове число')
+            if (inputData.length % 4 !== 0) return alert('Довжина двійкового числа мусить бути кратним чотирьом')
         }
-        console.log(this._inputData)
+        this._logger.notice(`Було введено: ${inputData}`)
+        this._logger.notice(`Далі все передається у вигляді двійкового коду на кодер ${this._inputData}`)
         this._encoderDecoder.encoder(this._inputData)
     }
     private fromDecimalToBinary (): void {
         let binary: string = '';
+        let binaryArray: Array<string> = []
         for (let i = 0; i < this._inputData.length; i++) {
             let fourBitsNumber: string = (Number(this._inputData[i]).toString(2))
             if (fourBitsNumber.length < 4) {
@@ -34,10 +38,13 @@ class ConverterToBinary {
                 while (fourBitsArray.length !== 4) {
                     fourBitsArray.unshift('0')
                 }
+
                 fourBitsNumber = fourBitsArray.join('')
             }
+            binaryArray.push(fourBitsNumber)
             binary += fourBitsNumber
         }
+        this._logger.notice(`Десяткове число поциферно переводиться в чотирьохбітовий двійковий код: ${binaryArray}`)
         this._inputData = binary;
     }
     private fromStringToBinary (): void {
@@ -56,7 +63,8 @@ class ConverterToBinary {
                 binaryArray.push(newBinaryCode)
             }
         }
-        console.log(decimalArray)
+        this._logger.notice(`Кожен символ переводиться в десяткову систему по юнікоду-12: ${decimalArray}`)
+        this._logger.notice(`Потім кожне десяткове число переводиться у двійкову: ${binaryArray}`)
         this._inputData = binaryArray.join('')
     }
 }

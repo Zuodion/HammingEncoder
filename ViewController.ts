@@ -4,16 +4,17 @@ class ViewController {
     private _inputData: string = '';
     private _introduceError: boolean = false;
     private _encoderDecoder: EncoderDecoder;
-    private _outputField: any;
+    private _logs: any;
     private _logger: Logger;
     private _converterFromBinary: ConverterFromBinary;
+    private _outputField: any;
     constructor(converterToBinary: ConverterToBinary, converterFromBinary: ConverterFromBinary, encoderDecoder: EncoderDecoder, logger: Logger) {
         this._converterToBinary = converterToBinary
         this._converterFromBinary = converterFromBinary
         this._encoderDecoder = encoderDecoder
         this._logger = logger
     }
-    public initialize() {
+    public initialize () {
         let inputField = (<HTMLInputElement>document.getElementById('inputData'))
         inputField.addEventListener("keyup", function (event) {
             console.log(event.keyCode)
@@ -22,11 +23,23 @@ class ViewController {
                 document.getElementById("buttonStart")!.click();
             }
         });
+        
     }
     private start (): void {
+        let outputField = document.getElementById('outputField')
+        let logs: any = document.getElementById('logs')
+        if (logs) {
+            this._logger.counter = 1;
+            outputField!.removeChild(logs)
+        }
+        logs = document.createElement('div')
+        logs.id = 'logs'
+        this._logs = logs
+        outputField!.appendChild(logs)
+
+
         let inputField = (<HTMLInputElement>document.getElementById('inputData'))
-        this._outputField = document.getElementById('output-field')
-        this._logger.setOutputField(this._outputField)
+        this._logger.setOutputField(this._logs)
         let radioButtons: Array<HTMLInputElement> = Array.prototype.slice.call(document.getElementsByName('type'), 0)
         let checked: Array<HTMLInputElement> = radioButtons.filter(radio => radio.checked)
         this._type = checked[0].value
