@@ -1,67 +1,84 @@
 <!DOCTYPE html>
 <html>
-    <head>
-        <meta charset="utf-8">
-        <meta http-equiv="X-UA-Compatible" content="IE=edge">
-        <title>Page Title</title>
-        <meta name="viewport" content="width=device-width, initial-scale=1">
-        <link rel="stylesheet" type="text/css" media="screen" href="main.css">
-        <script src="app.js"></script>
-    </head>
-    <body>
-        <div class="header">Hamming encoder and decoder</div>
-        <div class="input-form">
-            <p>Please select your data type:</p>
-            <div class="radio">
-                <input type="radio" id="numberRadio" name="type" value="numberRadio" checked>
-                <label for="numberRadio">Number</label>
-            </div>
-            <div class="radio">
-                <input type="radio" id="stringRadio" name="type" value="stringRadio">
-                <label for="stringRadio">String</label>
-            </div>
-            <div class="text-field">
-                <div>Please text your data:</div>
-                <input class="input-data" id="inputData">
-                <button class="button-start" onclick="main._viewController.start()">Start</button>
-            </div>
-        </div>
-        <hr>
-        <div class="output-field">
 
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Хеммінг</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" type="text/css" media="screen" href="main.css">
+</head>
+
+<body>
+    <div class="header">Кодер і декодер Хеммінга</div>
+    <div class="input-form">
+        <p>Вибіріть тип даних для кодування і декодування:</p>
+        <div class="introduce-error">
+            <input type="checkbox" id="introduceError" name="error" value="introduceError">
+            <label for="introduceError">Вставити однократну помилку?</label>
         </div>
-    </body>
+        <div class="radio">
+            <input type="radio" id="binaryRadio" name="type" value="binaryRadio" checked>
+            <label for="binaryRadio">Двійковий</label>
+        </div>
+        <div class="radio">
+            <input type="radio" id="decimalRadio" name="type" value="decimalRadio">
+            <label for="decimalRadio">Десятковий</label>
+        </div>
+        <div class="radio">
+            <input type="radio" id="stringRadio" name="type" value="stringRadio">
+            <label for="stringRadio">Текст</label>
+        </div>
+        <div class="text-field">
+            <div>Введіть ваші дані:</div>
+            <input class="input-data" id="inputData">
+            <button class="button-start" id="buttonStart" onclick="main._viewController.start()">Старт</button>
+        </div>
+    </div>
+    <hr>
+    <div class="output-field" id="output-field">
+
+    </div>
+    <script src="app.js"></script>
+</body>
+
 </html>
 
 <style>
-body {
-    font-family: 'Verdana';
-    background-color: rgb(228, 228, 228);
-    font-size: 20px;
-}
+    body {
+        font-family: 'Verdana';
+        background-color: rgb(228, 228, 228);
+        font-size: 20px;
+    }
 
-.header {
-    margin: 1em;
-    text-align: center;
-    font-size: 36px;
-}
+    .header {
+        min-width: 700px;
+        margin: 1em;
+        text-align: center;
+        font-size: 36px;
+    }
+    .input-form {
+        width: 600px;
+    }
+    .input-data,
+    .button-start {
+        background-color: aliceblue;
+        margin-bottom: 1em;
+        font-size: inherit;
+    }
 
-.input-data, .button-start {
-    background-color: aliceblue;
-    margin-bottom: 1em;
-    font-size: inherit;
-}
+    .button-start:focus {
+        outline: none;
+    }
 
-.button-start:focus {
-    outline: none;
-}
+    .input-data:focus {
+        outline: none;
+    }
+    .introduce-error {
+        float: right;
+    }
 
-.input-data:focus {
-    outline: none;
-}
-
-
-.radio{
-    margin-bottom: 1em;
-}
+    .radio {
+        margin-bottom: 1em;
+    }
 </style>

@@ -1,14 +1,20 @@
 class EncoderDecoder {
     private _matrix: Array<number>;
     private _converterFromBinary: ConverterFromBinary;
-    private _type: string = '';
-    constructor(matrix: Matrix, converterFromBinary: ConverterFromBinary) {
+    private _introduceError: boolean = false;
+    private _logger: Logger;
+    constructor(matrix: Matrix, converterFromBinary: ConverterFromBinary, logger: Logger) {
         this._matrix = matrix.defineMatrix()
         this._converterFromBinary = converterFromBinary
+        this._logger = logger
     }
-    public encoder (binaryCode: string, type: string): void {
-        this._type = type
+
+    public defineIntroduceError (introduceError: boolean): void {
+        this._introduceError = introduceError;
+    }
+    public encoder (binaryCode: string): void {
         let fourBitsArray: any = binaryCode.match(/.{1,4}/g)
+        console.log(fourBitsArray)
         let lastElement: string = fourBitsArray[fourBitsArray.length - 1]
         if (lastElement.length < 4) {
             let newLastElement: any = String(lastElement).split('')
@@ -55,7 +61,13 @@ class EncoderDecoder {
 
             encodedBitsArray.push(newElementArray.join(''))
         }
-        this.errorIntroducer(encodedBitsArray)
+        console.log(encodedBitsArray)
+        if (this._introduceError) {
+            this.errorIntroducer(encodedBitsArray)
+        } else {
+            this.decoder(encodedBitsArray)
+        }
+
     }
 
     private randomInteger (min: number, max: number) {
@@ -72,15 +84,18 @@ class EncoderDecoder {
             encodedCodeArray[randomIndex] = String(Number(!Number(encodedCodeArray[randomIndex])));
             encodedCorruptedCode.push(encodedCodeArray.join(''))
         }
+        console.log(encodedCorruptedCode)
         this.decoder(encodedCorruptedCode)
     }
 
     public decoder (encodedCode: Array<string>): void {
-        
+
         let decodedCode: any = [];
         for (let codeIndex = 0; codeIndex < encodedCode.length; codeIndex++) {
             let sevenBitsCode: any = encodedCode[codeIndex]
             let errorIndex: number = 0;
+
+            // Block correction error
             for (let matrixRow = 0; matrixRow < this._matrix.length; matrixRow++) {
                 let result: string = (Number('0b' + sevenBitsCode.toString(2)) & Number('0b' + this._matrix[matrixRow].toString(2))).toString(2)
 
@@ -105,12 +120,14 @@ class EncoderDecoder {
                     }
                 }
             }
+            
             let fixedCode = sevenBitsCode.split('')
             if (fixedCode[errorIndex - 1]) {
                 fixedCode[errorIndex - 1] = String(Number(!Number(fixedCode[errorIndex - 1])))
             }
             decodedCode.push(fixedCode.join(''))
         }
+        console.log(decodedCode)
         let fourBitsArray = [];
         for (let decodedCodeIndex = 0; decodedCodeIndex < decodedCode.length; decodedCodeIndex++) {
             let fourBits: any = decodedCode[decodedCodeIndex].split('')
@@ -119,6 +136,7 @@ class EncoderDecoder {
             fourBits.splice(1, 1);
             fourBitsArray.push(fourBits.join(''))
         }
-        this._converterFromBinary.convertToOriginalData(fourBitsArray, this._type)
+        console.log(fourBitsArray)
+        this._converterFromBinary.convertToOriginalData(fourBitsArray)
     }
 }
