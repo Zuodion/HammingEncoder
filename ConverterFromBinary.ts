@@ -18,7 +18,6 @@ class ConverterFromBinary {
             this._originalData = fourBitsArray
             this._logger.notice(`Далі числа поєднюються конкатенацією: ${fourBitsArray.join('')}`)
         }
-        console.log(this._originalData)
     }
     private fromBinaryToDecimal (fourBitsArray: any) {
         let originalData = ''

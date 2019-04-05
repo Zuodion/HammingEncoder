@@ -17,7 +17,6 @@ class ViewController {
     public initialize () {
         let inputField = (<HTMLInputElement>document.getElementById('inputData'))
         inputField.addEventListener("keyup", function (event) {
-            console.log(event.keyCode)
             if (event.keyCode === 13) {
                 event.preventDefault();
                 document.getElementById("buttonStart")!.click();
