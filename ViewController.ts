@@ -14,19 +14,9 @@ class ViewController {
         this._encoderDecoder = encoderDecoder
         this._logger = logger
     }
-    public initialize () {
-        let inputField = (<HTMLInputElement>document.getElementById('inputData'))
-        inputField.addEventListener("keyup", function (event) {
-            if (event.keyCode === 13) {
-                event.preventDefault();
-                document.getElementById("buttonStart")!.click();
-            }
-        });
-        
-    }
     private start (): void {
-        let outputField = document.getElementById('outputField')
-        let logs: any = document.getElementById('logs')
+        let outputField = (<HTMLDivElement>document.getElementById('outputField'))
+        let logs = (<HTMLDivElement>document.getElementById('logs'))
         if (logs) {
             this._logger.counter = 1;
             outputField!.removeChild(logs)
@@ -36,7 +26,6 @@ class ViewController {
         this._logs = logs
         outputField!.appendChild(logs)
 
-
         let inputField = (<HTMLInputElement>document.getElementById('inputData'))
         this._logger.setOutputField(this._logs)
         let radioButtons: Array<HTMLInputElement> = Array.prototype.slice.call(document.getElementsByName('type'), 0)
@@ -44,11 +33,9 @@ class ViewController {
         this._type = checked[0].value
         this._inputData = inputField.value
         this._introduceError = (<HTMLInputElement>document.getElementById('introduceError')).checked
+
         this._converterFromBinary.initializeType(this._type)
         this._encoderDecoder.defineIntroduceError(this._introduceError)
         this._converterToBinary.initializeConverter(this._inputData, this._type)
-
-
     }
-
 }

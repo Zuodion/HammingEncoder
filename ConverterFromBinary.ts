@@ -2,13 +2,13 @@ class ConverterFromBinary {
     private _type: string = '';
     private _originalData: string = '';
     private _logger: Logger;
-    constructor (logger: Logger){
+    constructor(logger: Logger) {
         this._logger = logger
     }
-    public initializeType(type: string){
+    public initializeType (type: string): void {
         this._type = type
     }
-    public convertToOriginalData (fourBitsArray: any) {
+    public convertToOriginalData (fourBitsArray: any): void {
         if (this._type === 'decimalRadio') {
             this.fromBinaryToDecimal(fourBitsArray)
         }
@@ -19,18 +19,18 @@ class ConverterFromBinary {
             this._logger.notice(`Далі числа поєднюються конкатенацією: ${fourBitsArray.join('')}`)
         }
     }
-    private fromBinaryToDecimal (fourBitsArray: any) {
-        let originalData = ''
+    private fromBinaryToDecimal (fourBitsArray: any): void {
+        let originalData: string = ''
         for (let fourBitsItem = 0; fourBitsItem < fourBitsArray.length; fourBitsItem++) {
             originalData += parseInt(fourBitsArray[fourBitsItem], 2);
         }
         this._logger.notice(`Далі переводиться з двійкової системи посимвольно назад в десяткову і поєднюється конкатенацією: ${originalData}`)
         this._originalData = originalData;
     }
-    private fromBinaryToString (fourBitsArray: any) {
-        let decimalArray = []
-        let originalData = ''
-        let twelveBitsCode = fourBitsArray.join('').match(/.{12}/g)
+    private fromBinaryToString (fourBitsArray: any): void {
+        let decimalArray: Array<any> = []
+        let originalData: string = ''
+        let twelveBitsCode: string = fourBitsArray.join('').match(/.{12}/g)
         this._logger.notice(`Далі дані діляться по 12 бітів ${twelveBitsCode}`)
         for (let i = 0; i < twelveBitsCode.length; i++) {
             originalData += String.fromCharCode(parseInt(twelveBitsCode[i], 2))
