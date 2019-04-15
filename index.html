@@ -1,45 +1,51 @@
 <!DOCTYPE html>
 <html>
 
-<head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title>Хеммінг</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-</head>
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <title>Хеммінг</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+    </head>
 
-<body>
-    <div class="header">Кодер і декодер Хеммінга</div>
-    <div class="input-form">
-        <p>Вибіріть тип даних для кодування і декодування:</p>
-        <div class="introduce-error">
-            <input type="checkbox" id="introduceError" name="error" value="introduceError">
-            <label for="introduceError">Вставити однократну помилку?</label>
+    <body>
+        <div class="header">Кодер і декодер Хеммінга</div>
+        <div class="input-form">
+            <p>Вибіріть тип даних для кодування і декодування:</p>
+            <div class="introduce-error">
+                <div class="input-checkbox">
+                    <input type="checkbox" id="introduceError" name="error" value="introduceError">
+                    <label for="introduceError">Вставити однократну помилку?</label>
+                </div>
+                <div class="input-checkbox">
+                    <input type="checkbox" id="introduceDoubleError" name="error" value="introduceDoubleError">
+                    <label for="introduceDoubleError">Вставити двократну помилку?</label>
+                </div>
+            </div>
+            <div class="radio">
+                <input type="radio" id="binaryRadio" name="type" value="binaryRadio" checked>
+                <label for="binaryRadio">Двійковий</label>
+            </div>
+            <div class="radio">
+                <input type="radio" id="decimalRadio" name="type" value="decimalRadio">
+                <label for="decimalRadio">Десятковий</label>
+            </div>
+            <div class="radio">
+                <input type="radio" id="stringRadio" name="type" value="stringRadio">
+                <label for="stringRadio">Текст</label>
+            </div>
+            <div class="text-field">
+                <div>Введіть ваші дані:</div>
+                <input class="input-data" id="inputData">
+                <button class="button-start" id="buttonStart" onclick="main._viewController.start()">Старт</button>
+            </div>
         </div>
-        <div class="radio">
-            <input type="radio" id="binaryRadio" name="type" value="binaryRadio" checked>
-            <label for="binaryRadio">Двійковий</label>
-        </div>
-        <div class="radio">
-            <input type="radio" id="decimalRadio" name="type" value="decimalRadio">
-            <label for="decimalRadio">Десятковий</label>
-        </div>
-        <div class="radio">
-            <input type="radio" id="stringRadio" name="type" value="stringRadio">
-            <label for="stringRadio">Текст</label>
-        </div>
-        <div class="text-field">
-            <div>Введіть ваші дані:</div>
-            <input class="input-data" id="inputData">
-            <button class="button-start" id="buttonStart" onclick="main._viewController.start()">Старт</button>
-        </div>
-    </div>
-    <hr>
-    <div class="output-field" id="outputField">
+        <hr>
+        <div class="output-field" id="outputField">
 
-    </div>
-    <script src="app.js"></script>
-</body>
+        </div>
+        <script src="app.js"></script>
+    </body>
 
 </html>
 
@@ -57,7 +63,7 @@
         font-size: 36px;
     }
     .input-form {
-        width: 600px;
+        width: 1000px;
     }
     .input-data,
     .button-start {
@@ -76,7 +82,9 @@
     .introduce-error {
         float: right;
     }
-
+    .input-checkbox {
+        margin-bottom: 1em;
+    }
     .radio {
         margin-bottom: 1em;
     }

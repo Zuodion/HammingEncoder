@@ -3,6 +3,7 @@ class ViewController {
     private _type: string = '';
     private _inputData: string = '';
     private _introduceError: boolean = false;
+    private _introduceDoubleError: boolean = false;
     private _encoderDecoder: EncoderDecoder;
     private _logs: any;
     private _logger: Logger;
@@ -33,9 +34,10 @@ class ViewController {
         this._type = checked[0].value
         this._inputData = inputField.value
         this._introduceError = (<HTMLInputElement>document.getElementById('introduceError')).checked
+        this._introduceDoubleError = (<HTMLInputElement>document.getElementById('introduceDoubleError')).checked
 
         this._converterFromBinary.initializeType(this._type)
-        this._encoderDecoder.defineIntroduceError(this._introduceError)
+        this._encoderDecoder.defineIntroduceError(this._introduceError, this._introduceDoubleError)
         this._converterToBinary.initializeConverter(this._inputData, this._type)
     }
 }

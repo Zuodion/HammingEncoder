@@ -18,8 +18,7 @@ class Logger {
         this._outputField.appendChild(div)
     }
 
-    public colorizeElement (string: string, index: number, color: string): string {
-        let array: Array<string> = string.split('')
+    public colorizeElement (array: Array<string>, index: number, color: string): string {
         let colorizingElement: string = array[index]
         array[index] = `<span style="color:${color}">${colorizingElement}</span>`
         return array.join('');

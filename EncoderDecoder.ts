@@ -2,6 +2,7 @@ class EncoderDecoder {
     private _matrix: Array<number>;
     private _converterFromBinary: ConverterFromBinary;
     private _introduceError: boolean = false;
+    private _introduceDoubleError: boolean = false;
     private _logger: Logger;
     constructor(matrix: Matrix, converterFromBinary: ConverterFromBinary, logger: Logger) {
         this._matrix = matrix.defineMatrix()
@@ -9,8 +10,9 @@ class EncoderDecoder {
         this._logger = logger
     }
 
-    public defineIntroduceError (introduceError: boolean): void {
+    public defineIntroduceError (introduceError: boolean, introduceDoubleError: boolean): void {
         this._introduceError = introduceError;
+        this._introduceDoubleError = introduceDoubleError
     }
     public encoder (binaryCode: string): void {
         let fourBitsArray: any = binaryCode.match(/.{1,4}/g)
@@ -48,12 +50,14 @@ class EncoderDecoder {
             encodedBitsArray.push(sevenBitsArray.join(''))
         }
         this._logger.notice(`Числа кодуються кодом Хемінга ${encodedBitsArray}`)
-        if (this._introduceError) {
+        if (this._introduceError && !this._introduceDoubleError) {
             this.errorIntroducer(encodedBitsArray)
-        } else {
-            this.decoder(encodedBitsArray)
+        } else if (!this._introduceError && this._introduceDoubleError) {
+            this.errorDoubleIntroducer(encodedBitsArray)
+        } else if (this._introduceError && this._introduceDoubleError) {
+            this.errorMixedIntroducer(encodedBitsArray)
         }
-
+        else this.decoder(encodedBitsArray)
     }
 
     private randomInteger (min: number, max: number): number {
@@ -61,7 +65,6 @@ class EncoderDecoder {
         randomInt = Math.round(randomInt);
         return randomInt;
     }
-
     private errorIntroducer (encodedCode: any): void {
         let encodedCorruptedCode: Array<string> = [];
         let htmlArray: Array<string> = []
@@ -71,10 +74,66 @@ class EncoderDecoder {
             encodedCodeArray[randomIndex] = String(Number(!Number(encodedCodeArray[randomIndex])));
             encodedCorruptedCode.push(encodedCodeArray.join(''))
 
-            let htmlElement: string = this._logger.colorizeElement(encodedCodeArray.join(''), randomIndex, 'red')
+            let htmlElement: string = this._logger.colorizeElement(encodedCodeArray, randomIndex, 'red')
             htmlArray.push(htmlElement)
         }
         this._logger.notice(`Випадковим чином вводяться однобітові помилки: ${htmlArray}`)
+        this.decoder(encodedCorruptedCode)
+    }
+
+    private errorDoubleIntroducer (encodedCode: any): void {
+        let encodedCorruptedCode: Array<string> = [];
+        let htmlArray: Array<string> = []
+        for (let index = 0; index < encodedCode.length; index++) {
+            let encodedCodeArray: Array<string> = encodedCode[index].split('')
+            let firstIndex: number = (this.randomInteger(1, 7) - 1)
+            encodedCodeArray[firstIndex] = String(Number(!Number(encodedCodeArray[firstIndex])));
+
+            let secondIndex: number = (this.randomInteger(1, 7) - 1)
+            while (firstIndex === secondIndex) {
+                secondIndex = (this.randomInteger(1, 7) - 1)
+            }
+            encodedCodeArray[secondIndex] = String(Number(!Number(encodedCodeArray[secondIndex])));
+            encodedCorruptedCode.push(encodedCodeArray.join(''))
+
+            let htmlElement: string = this._logger.colorizeElement(encodedCodeArray, firstIndex, 'red')
+            htmlElement = this._logger.colorizeElement(encodedCodeArray, secondIndex, 'red')
+            htmlArray.push(htmlElement)
+        }
+        this._logger.notice(`Випадковим чином вводяться двобітові помилки: ${htmlArray}`)
+        this.decoder(encodedCorruptedCode)
+    }
+
+    private errorMixedIntroducer (encodedCode: any): void {
+        let encodedCorruptedCode: Array<string> = [];
+        let htmlArray: Array<string> = []
+        for (let index = 0; index < encodedCode.length; index++) {
+            if (this.randomInteger(1, 2) - 1) {
+                let encodedCodeArray: Array<string> = encodedCode[index].split('')
+                let firstIndex: number = (this.randomInteger(1, 7) - 1)
+                encodedCodeArray[firstIndex] = String(Number(!Number(encodedCodeArray[firstIndex])));
+
+                let secondIndex: number = (this.randomInteger(1, 7) - 1)
+                while (firstIndex === secondIndex) {
+                    secondIndex = (this.randomInteger(1, 7) - 1)
+                }
+                encodedCodeArray[secondIndex] = String(Number(!Number(encodedCodeArray[secondIndex])));
+                encodedCorruptedCode.push(encodedCodeArray.join(''))
+
+                let htmlElement: string = this._logger.colorizeElement(encodedCodeArray, firstIndex, 'red')
+                htmlElement = this._logger.colorizeElement(encodedCodeArray, secondIndex, 'red')
+                htmlArray.push(htmlElement)
+            } else {
+                let encodedCodeArray: Array<string> = encodedCode[index].split('')
+                let randomIndex: number = (this.randomInteger(1, 7) - 1)
+                encodedCodeArray[randomIndex] = String(Number(!Number(encodedCodeArray[randomIndex])));
+                encodedCorruptedCode.push(encodedCodeArray.join(''))
+
+                let htmlElement: string = this._logger.colorizeElement(encodedCodeArray, randomIndex, 'red')
+                htmlArray.push(htmlElement)
+            }
+        }
+        this._logger.notice(`Випадковим чином вводяться однократні і двократні помилки: ${htmlArray}`)
         this.decoder(encodedCorruptedCode)
     }
 
@@ -87,7 +146,7 @@ class EncoderDecoder {
             let errorIndex: number = 0;
 
             // Block correction error
-            if (this._introduceError) {
+            if (this._introduceError || this._introduceDoubleError) {
                 for (let matrixRow = 0; matrixRow < this._matrix.length; matrixRow++) {
                     let resultMode2: string = (Number('0b' + sevenBitsCode.toString(2)) & Number('0b' + this._matrix[matrixRow].toString(2))).toString(2)
 
@@ -119,10 +178,10 @@ class EncoderDecoder {
             }
             decodedCode.push(fixedCode.join(''))
 
-            let htmlElement: string = this._logger.colorizeElement(fixedCode.join(''), errorIndex - 1, 'aqua')
+            let htmlElement: string = this._logger.colorizeElement(fixedCode, errorIndex - 1, 'aqua')
             htmlArray.push(htmlElement)
         }
-        if (this._introduceError) {
+        if (this._introduceError || this._introduceDoubleError) {
             this._logger.notice(`За допомогою декодування знаходяться помилки і виправляються: ${htmlArray}`)
         }
 
