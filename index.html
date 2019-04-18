@@ -13,24 +13,46 @@
         <div class="input-form">
             <p>Вибіріть тип даних для кодування і декодування:</p>
             <div class="introduce-error">
-                <div class="input-checkbox">
-                    <input type="checkbox" id="introduceError" name="error" value="introduceError">
-                    <label for="introduceError">Вставити однократну помилку?</label>
+                <div class="define-error-type">
+                    <div class="radio-error-type">
+                        <input type="radio" id="noError" name="error-type" value="noError" checked>
+                        <label for="noError">Не вводити помилки</label>
+                    </div>
+                    <div class="radio-error-type">
+                        <input type="radio" id="introduceRandomError" name="error-type" value="introduceRandomError">
+                        <label for="introduceRandomError">Ввести випадкову помилку</label>
+                    </div>
+                    <div class="radio-error-type">
+                        <input type="radio" id="introduceDeterminedError" name="error-type" value="introduceDeterminedError">
+                        <label for="introduceDeterminedError">Ввести визначені помилки</label>
+                    </div>
                 </div>
-                <div class="input-checkbox">
-                    <input type="checkbox" id="introduceDoubleError" name="error" value="introduceDoubleError">
-                    <label for="introduceDoubleError">Вставити двократну помилку?</label>
+                <div class="introduce-random-error" id="randomError">
+                    <div class="input-checkbox">
+                        <input type="checkbox" id="introduceError" name="error" value="introduceError">
+                        <label for="introduceError">Вставити однократну помилку?</label>
+                    </div>
+                    <div class="input-checkbox">
+                        <input type="checkbox" id="introduceDoubleError" name="error" value="introduceDoubleError">
+                        <label for="introduceDoubleError">Вставити двократну помилку?</label>
+                    </div>
+                </div>
+                <div class="introduce-determined-error" id="determinedError">
+                    <div class="error-field">
+                        <div>Вкажіть куди ввести помилку:</div>
+                        <input class="input-data" id="inputError">
+                    </div>
                 </div>
             </div>
-            <div class="radio">
+            <div class="radio-data-type">
                 <input type="radio" id="binaryRadio" name="type" value="binaryRadio" checked>
                 <label for="binaryRadio">Двійковий</label>
             </div>
-            <div class="radio">
+            <div class="radio-data-type">
                 <input type="radio" id="decimalRadio" name="type" value="decimalRadio">
                 <label for="decimalRadio">Десятковий</label>
             </div>
-            <div class="radio">
+            <div class="radio-data-type">
                 <input type="radio" id="stringRadio" name="type" value="stringRadio">
                 <label for="stringRadio">Текст</label>
             </div>
@@ -63,7 +85,7 @@
         font-size: 36px;
     }
     .input-form {
-        width: 1000px;
+        width: 1500px;
     }
     .input-data,
     .button-start {
@@ -76,16 +98,19 @@
         outline: none;
     }
 
-    .input-data:focus {
+    .input-data:focus .error-field:focus {
         outline: none;
+    }
+    .error-field {
+        margin-left: 5px;
     }
     .introduce-error {
         float: right;
     }
-    .input-checkbox {
+    .input-checkbox, .radio-error-type{
         margin-bottom: 1em;
     }
-    .radio {
+    .radio-data-type {
         margin-bottom: 1em;
     }
 
@@ -93,6 +118,17 @@
         color: rgb(32, 32, 32);
     }
 
+    .define-error-type{
+        white-space: nowrap;
+    }
+    .radio-error-type{
+        display: inline-block;
+        margin-right: 15px;
+        margin-bottom: 10px;
+    }
+    .introduce-determined-error, .introduce-random-error{
+        display: none;
+    }
     .log {
         margin-bottom: 5px;
     }

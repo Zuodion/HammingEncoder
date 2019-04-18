@@ -4,15 +4,17 @@ class EncoderDecoder {
     private _introduceError: boolean = false;
     private _introduceDoubleError: boolean = false;
     private _logger: Logger;
+    private _errorData: string = '';
     constructor(matrix: Matrix, converterFromBinary: ConverterFromBinary, logger: Logger) {
         this._matrix = matrix.defineMatrix()
         this._converterFromBinary = converterFromBinary
         this._logger = logger
     }
 
-    public defineIntroduceError (introduceError: boolean, introduceDoubleError: boolean): void {
+    public defineIntroduceError (introduceError: boolean, introduceDoubleError: boolean, errorData: string): void {
         this._introduceError = introduceError;
-        this._introduceDoubleError = introduceDoubleError
+        this._introduceDoubleError = introduceDoubleError;
+        this._errorData = errorData;
     }
     public encoder (binaryCode: string): void {
         let fourBitsArray: any = binaryCode.match(/.{1,4}/g)
@@ -56,6 +58,8 @@ class EncoderDecoder {
             this.errorDoubleIntroducer(encodedBitsArray)
         } else if (this._introduceError && this._introduceDoubleError) {
             this.errorMixedIntroducer(encodedBitsArray)
+        } else if (this._errorData !== '') {
+            this.errorDeterminedIntroducer(encodedBitsArray)
         }
         else this.decoder(encodedBitsArray)
     }
@@ -137,6 +141,30 @@ class EncoderDecoder {
         this.decoder(encodedCorruptedCode)
     }
 
+    private errorDeterminedIntroducer (encodedCode: any): void {
+        let encodedCorruptedCode: Array<string> = [];
+        let htmlArray: Array<string> = [];
+        for (let codeIndex = 0; codeIndex < encodedCode.length; codeIndex++) {
+            let encodedCodeArray: Array<string> = encodedCode[codeIndex].split('')
+            for (let index = 0; index < this._errorData.length; index++) {
+                let errorIndex: any = this._errorData[index];
+                encodedCodeArray[errorIndex-1] = String(Number(!Number(encodedCodeArray[errorIndex-1])))
+            }
+            encodedCorruptedCode.push(encodedCodeArray.join(''))
+
+            // Colorizer
+            let htmlElement = '';
+            for (let index = 0; index < this._errorData.length; index++) {
+                let errorIndex: any = this._errorData[index];
+                htmlElement = this._logger.colorizeElement(encodedCodeArray, errorIndex-1, 'red')
+            }
+            htmlArray.push(htmlElement)
+
+        }
+        this._logger.notice(`Виставляються помилки вибраним чином: ${htmlArray}`)
+        this.decoder(encodedCorruptedCode)
+    }
+
     public decoder (encodedCode: Array<string>): void {
         let htmlArray: Array<string> = []
         let decodedCode: Array<string> = [];
@@ -146,7 +174,7 @@ class EncoderDecoder {
             let errorIndex: number = 0;
 
             // Block correction error
-            if (this._introduceError || this._introduceDoubleError) {
+            if (this._introduceError || this._introduceDoubleError || this._errorData) {
                 for (let matrixRow = 0; matrixRow < this._matrix.length; matrixRow++) {
                     let resultMode2: string = (Number('0b' + sevenBitsCode.toString(2)) & Number('0b' + this._matrix[matrixRow].toString(2))).toString(2)
 
@@ -181,7 +209,7 @@ class EncoderDecoder {
             let htmlElement: string = this._logger.colorizeElement(fixedCode, errorIndex - 1, 'aqua')
             htmlArray.push(htmlElement)
         }
-        if (this._introduceError || this._introduceDoubleError) {
+        if (this._introduceError || this._introduceDoubleError || this._errorData) {
             this._logger.notice(`За допомогою декодування знаходяться помилки і виправляються: ${htmlArray}`)
         }
 
