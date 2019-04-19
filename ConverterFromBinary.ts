@@ -3,19 +3,19 @@ class ConverterFromBinary {
     private _originalData: string = '';
     private _logger: Logger;
     constructor(logger: Logger) {
-        this._logger = logger
+        this._logger = logger;
     }
     public initializeType (type: string): void {
-        this._type = type
+        this._type = type;
     }
     public convertToOriginalData (fourBitsArray: any): void {
         if (this._type === 'decimalRadio') {
-            this.fromBinaryToDecimal(fourBitsArray)
+            this.fromBinaryToDecimal(fourBitsArray);
         }
         else if (this._type === 'stringRadio') {
-            this.fromBinaryToString(fourBitsArray)
+            this.fromBinaryToString(fourBitsArray);
         } else {
-            this._originalData = fourBitsArray
+            this._originalData = fourBitsArray;
             this._logger.notice(`Далі числа поєднюються конкатенацією: ${fourBitsArray.join('')}`)
         }
     }

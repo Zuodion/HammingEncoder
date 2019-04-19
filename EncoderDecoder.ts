@@ -1,9 +1,9 @@
 class EncoderDecoder {
     private _matrix: Array<number>;
     private _converterFromBinary: ConverterFromBinary;
+    private _logger: Logger;
     private _introduceError: boolean = false;
     private _introduceDoubleError: boolean = false;
-    private _logger: Logger;
     private _errorData: string = '';
     constructor(matrix: Matrix, converterFromBinary: ConverterFromBinary, logger: Logger) {
         this._matrix = matrix.defineMatrix()
